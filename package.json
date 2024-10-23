@@ -1,0 +1,23 @@
+{
+  "name": "bidding-auction-local-console",
+  "version": "0.1.0",
+  "description": "Local developer console for Bidding and Auction Services",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "watch": "node --watch ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/privacysandbox/bidding-auction-local-console.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/privacysandbox/bidding-auction-local-console/issues"
+  },
+  "homepage": "https://github.com/privacysandbox/bidding-auction-local-console#readme",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
