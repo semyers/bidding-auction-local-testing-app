@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      @import url(//fonts.googleapis.com/css2?family=Google+Sans);
+      html,
+      button,
+      input,
+      optgroup,
+      select,
+      textarea {
+        font-family: 'Google Sans', arial, sans-serif;
+      }
+
+      body {
+        background-color: #ececec;
+      }
+
+      .join-ad-interest-group {
+        display: none;
+      }
+    </style>
+    <script>
+      function loadDspTags() {
+        [
+          'https://localhost:5001/join-ad-interest-group.html',
+          'https://localhost:5002/join-ad-interest-group.html',
+          'https://localhost:5003/join-ad-interest-group.html',
+          'https://localhost:5004/join-ad-interest-group.html',
+        ].forEach((tagUrl) => {
+          const iframeEl = document.createElement('iframe');
+          iframeEl.setAttribute('allow', 'join-ad-interest-group');
+          iframeEl.className = 'join-ad-interest-group';
+          iframeEl.src = tagUrl;
+
+          document.body.appendChild(iframeEl);
+        });
+
+        const message = 'Loaded DSP tags';
+        console.log(`[Advertiser] ${message}`);
+
+        const paragraphEl = document.createElement('p');
+        paragraphEl.innerHTML = message;
+        document.body.appendChild(paragraphEl);
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="loadDspTags()">Load DSP tags</button>
+  </body>
+</html>

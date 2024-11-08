@@ -1,0 +1,6 @@
+docker network create --driver=bridge --subnet=192.168.84.0/24 ba-dev 
+
+npm install
+npx mkcert create-ca localhost --cert ./certs/localhost.pem --key ./certs/localhost-key.pem
+
+./build

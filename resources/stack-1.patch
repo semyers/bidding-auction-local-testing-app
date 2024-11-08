@@ -1,0 +1,192 @@
+From 461bcae79d06825738b5058cf93a9b1dea0e79ce Mon Sep 17 00:00:00 2001
+From: "Kevin K. Lee" <kevinkiklee@google.com>
+Date: Fri, 8 Nov 2024 14:50:57 +0000
+Subject: [PATCH] Update start-up scripts
+
+---
+ .../http/multi_curl_http_fetcher_async.cc     |  5 +++-
+ tools/debug/start_auction                     |  7 +++---
+ tools/debug/start_bfe                         |  9 ++++----
+ tools/debug/start_bidding                     |  7 +++---
+ tools/debug/start_sfe                         | 23 +++++++++++--------
+ 5 files changed, 31 insertions(+), 20 deletions(-)
+
+diff --git a/services/common/clients/http/multi_curl_http_fetcher_async.cc b/services/common/clients/http/multi_curl_http_fetcher_async.cc
+index ee9bbc4..6b60a89 100644
+--- a/services/common/clients/http/multi_curl_http_fetcher_async.cc
++++ b/services/common/clients/http/multi_curl_http_fetcher_async.cc
+@@ -316,7 +316,10 @@ MultiCurlHttpFetcherAsync::CreateCurlRequest(
+   if (request.redirect_config.strict_http) {
+     curl_easy_setopt(req_handle, CURLOPT_REDIR_PROTOCOLS_STR, "http,https");
+   }
+-
++  // Disable SSL hostname and peer verification for testing
++  // Do not use for production
++  curl_easy_setopt(req_handle, CURLOPT_SSL_VERIFYHOST, 0L);
++  curl_easy_setopt(req_handle, CURLOPT_SSL_VERIFYPEER, 0L);
+   curl_easy_setopt(req_handle, CURLOPT_TIMEOUT_MS, timeout_ms);
+   // Enable TCP keep-alive to keep connection warm.
+   curl_easy_setopt(req_handle, CURLOPT_TCP_KEEPALIVE, 1L);
+diff --git a/tools/debug/start_auction b/tools/debug/start_auction
+index 70ca3b9..0a37c3d 100755
+--- a/tools/debug/start_auction
++++ b/tools/debug/start_auction
+@@ -15,7 +15,7 @@
+ 
+ source $(dirname "$0")/common
+ 
+-export AUCTION_JS_URL=""
++# export AUCTION_JS_URL=""
+ export BUYER_REPORT_WIN_URL=""
+ export BUYER_REPORT_WIN_SCRIPT=""
+ 
+@@ -45,7 +45,7 @@ export SERVER_START_CMD=$(cat << END
+     }' \
+ --enable_otel_based_logging="true" \
+ --consented_debug_token="test_token" \
+---ps_verbosity=2 \
++--ps_verbosity=10 \
+ --enable_protected_audience="true" \
+ --auction_tcmalloc_background_release_rate_bytes_per_second=4096 \
+ --auction_tcmalloc_max_total_thread_cache_bytes=10737418240 \
+@@ -67,7 +67,8 @@ if [[ $1 == "--gdb" ]]; then
+ else
+   docker_image_uri="$(docker load -i dist/debian/auction_service_image.tar | sed -nr "s/^Loaded image: (.*)$/\1/p")"
+   declare -a DOCKER_RUN_ARGS=(
+-      "--network=host"
++      "--network=ba-dev"
++      "--ip=192.168.84.103"
+       "--security-opt=seccomp=unconfined"
+       "--security-opt=apparmor=unconfined"
+   )
+diff --git a/tools/debug/start_bfe b/tools/debug/start_bfe
+index 5e752db..d4b2012 100755
+--- a/tools/debug/start_bfe
++++ b/tools/debug/start_bfe
+@@ -16,12 +16,12 @@
+ source $(dirname "$0")/common
+ export EXTRA_DOCKER_RUN_ARGS="${COMMON_DOCKER_RUN_ARGS[@]} ${DOCKER_RUN_ARGS[@]}"
+ 
+-export BUYER_KV_SERVER_ADDR=""
++# export BUYER_KV_SERVER_ADDR=""
+ 
+ export SERVER_START_CMD=$(cat << END
+ /server/bin/server \
+ --init_config_client="false" --port=50051 \
+---bidding_server_addr="127.0.0.1:50057" \
++--bidding_server_addr="192.168.84.101:50057" \
+ --buyer_kv_server_addr="${BUYER_KV_SERVER_ADDR}" \
+ --enable_buyer_frontend_benchmarking="true" \
+ --generate_bid_timeout_ms=60000 --bidding_signals_load_timeout_ms 60000 \
+@@ -31,7 +31,7 @@ export SERVER_START_CMD=$(cat << END
+ --telemetry_config="mode: OFF" \
+ --enable_otel_based_logging="true" \
+ --consented_debug_token="test_token" \
+---ps_verbosity=2 \
++--ps_verbosity=10 \
+ --enable_chaffing="false" \
+ --enable_protected_audience="true" \
+ --bfe_tcmalloc_background_release_rate_bytes_per_second=4096 \
+@@ -52,7 +52,8 @@ if [[ $1 == "--gdb" ]]; then
+ else
+   docker_image_uri="$(docker load -i dist/debian/buyer_frontend_service_image.tar | sed -nr "s/^Loaded image: (.*)$/\1/p")"
+   declare -a DOCKER_RUN_ARGS=(
+-      "--network=host"
++      "--network=ba-dev"
++      "--ip=192.168.84.102"
+       "--security-opt=seccomp=unconfined"
+       "--security-opt=apparmor=unconfined"
+   )
+diff --git a/tools/debug/start_bidding b/tools/debug/start_bidding
+index cbdd02d..943fdbd 100755
+--- a/tools/debug/start_bidding
++++ b/tools/debug/start_bidding
+@@ -69,7 +69,7 @@ function get_libcddl_path() {
+   done
+ }
+ 
+-export BIDDING_JS_URL=""
++# export BIDDING_JS_URL=""
+ export EGRESS_SCHEMA_URL=""
+ 
+ # Set default buyer code fetch config
+@@ -146,7 +146,7 @@ export SERVER_START_CMD=$(cat << END
+ --consented_debug_token="test_token" \
+ --enable_protected_audience="true" \
+ --tee_ad_retrieval_kv_server_addr="localhost:50057" \
+---ps_verbosity=2 \
++--ps_verbosity=10 \
+ --bidding_tcmalloc_background_release_rate_bytes_per_second=4096 \
+ --bidding_tcmalloc_max_total_thread_cache_bytes=10737418240 \
+ --ad_retrieval_timeout_ms="60000" \
+@@ -180,7 +180,8 @@ if [[ ${USE_GDB} -eq 1 ]]; then
+ else
+   docker_image_uri="$(docker load -i dist/debian/bidding_service_image.tar | sed -nr "s/^Loaded image: (.*)$/\1/p")"
+   declare -a DOCKER_RUN_ARGS=(
+-      "--network=host"
++      "--network=ba-dev"
++      "--ip=192.168.84.101"
+       "--security-opt=seccomp=unconfined"
+       "--security-opt=apparmor=unconfined"
+   )
+diff --git a/tools/debug/start_sfe b/tools/debug/start_sfe
+index 0f2bd91..dbc1483 100755
+--- a/tools/debug/start_sfe
++++ b/tools/debug/start_sfe
+@@ -15,20 +15,24 @@
+ 
+ source $(dirname "$0")/common
+ 
+-export BUYER_SERVER_HOST=""
+-export KEY_VALUE_SIGNALS_HOST=""
+-export SELLER_ORIGIN_DOMAIN=""
++# export BUYER_SERVER_HOST=""
++# export KEY_VALUE_SIGNALS_HOST=""
++# export SELLER_ORIGIN_DOMAIN=""
+ 
+ export SERVER_START_CMD=$(cat << END
+ /server/bin/server \
+ --init_config_client="false" --port=50053 \
+---auction_server_host="127.0.0.1:50061" \
++--auction_server_host="192.168.84.103:50061" \
+ --key_value_signals_host="${KEY_VALUE_SIGNALS_HOST}" \
+ --seller_origin_domain="${SELLER_ORIGIN_DOMAIN}" \
+ --seller_cloud_platforms_map='{"component-seller1.com":"GCP", "component-seller2.com":"AWS"}' \
+ --buyer_server_hosts='{
+-  "${BUYER_SERVER_HOST}": {
+-    "url": "127.0.0.1:50051",
++  "https://localhost:5003": {
++    "url": "192.168.84.102:50051",
++    "cloudPlatform": "LOCAL"
++  },
++  "https://localhost:5004": {
++    "url": "192.168.84.202:50051",
+     "cloudPlatform": "LOCAL"
+   }
+ }' \
+@@ -38,10 +42,10 @@ export SERVER_START_CMD=$(cat << END
+ --create_new_event_engine="false" \
+ --test_mode="true" \
+ --enable_chaffing="false" \
+---telemetry_config="mode: EXPERIMENT" \
++--telemetry_config="mode: OFF" \
+ --enable_otel_based_logging="true" \
+ --consented_debug_token="test_token" \
+---ps_verbosity=2 \
++--ps_verbosity=10 \
+ --enable_protected_audience="true" \
+ --sfe_tcmalloc_background_release_rate_bytes_per_second=4096 \
+ --sfe_tcmalloc_max_total_thread_cache_bytes=10737418240 \
+@@ -62,7 +66,8 @@ if [[ $1 == "--gdb" ]]; then
+ else
+   docker_image_uri="$(docker load -i dist/debian/seller_frontend_service_image.tar | sed -nr "s/^Loaded image: (.*)$/\1/p")"
+   declare -a DOCKER_RUN_ARGS=(
+-      "--network=host"
++      "--network=ba-dev"
++      "--ip=192.168.84.104"
+       "--security-opt=seccomp=unconfined"
+       "--security-opt=apparmor=unconfined"
+   )
+-- 
+2.47.0.277.g8800431eea-goog
+

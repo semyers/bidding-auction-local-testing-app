@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en" theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@2.1.1/dist/css/materialize.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@2.1.1/dist/js/materialize.min.js"></script>
+    <style>
+      @import url(//fonts.googleapis.com/css2?family=Google+Sans);
+
+      html,
+      button,
+      input,
+      optgroup,
+      select,
+      textarea {
+        font-family: 'Google Sans', arial, sans-serif;
+      }
+    </style>
+    <link rel="stylesheet" href="index.css" />
+    <script defer src="index.js"></script>
+  </head>
+
+  <body>
+    <!-- Nav bar -->
+    <nav class="blue">
+      <a href="#" class="left brand-logo px-6">B&A Local Testing</a>
+    </nav>
+
+    <!-- Page container -->
+    <div class="container">
+      <div id="local-test-container" class="card-panel mt-5">
+        <!-- Instructions section -->
+        <div id="local-test-demo-section" class="mb-5">
+          <h5 class="mt-1 mb-4">Instructions</h5>
+          <div class="row">
+            <div
+              id="local-test-instructions-panel"
+              class="card col s12 text-align py-2 px-4"
+            >
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Phasellus mollis ante non leo venenatis, nec ultricies ante
+                vulputate. Sed quam neque, dictum eget leo et, consequat
+                interdum diam. Phasellus bibendum tincidunt erat. Maecenas
+                malesuada auctor mauris, et commodo tellus lacinia in. Duis
+                auctor elit nec nulla finibus mollis. Morbi eget lectus mauris.
+                Vivamus tincidunt erat a mi aliquet tempus.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demo section -->
+        <div id="local-test-demo-section" class="mb-5">
+          <h5 class="mt-1 mb-4">Demo</h5>
+          <div class="row g-2">
+            <div
+              id="local-test-control-panel"
+              class="card col s4 center-align py-2 px-4"
+            >
+              <h6 class="">Controls</h6>
+              <div
+                class="btn elevated py-0 m-2"
+                onclick="loadSingleSellerOnDeviceAuction()"
+              >
+                Run single-seller <br />on-device auction
+              </div>
+              <br />
+              <div
+                class="btn elevated py-0 m-2"
+                onclick="loadSingleSellerBaAuction()"
+              >
+                Run single-seller <br />B&A auction
+              </div>
+              <br />
+              <div
+                class="btn elevated py-0 m-2"
+                onclick="loadSingleSellerMixedModeAuction()"
+              >
+                Run single-seller <br />mixed-mode auction
+              </div>
+              <br />
+              <div
+                class="btn elevated py-0 m-2"
+                onclick="loadMultiSellerMixedModeAuction()"
+              >
+                Run multi-seller <br />mixed-mode auction
+              </div>
+              <br />
+            </div>
+            <div
+              id="local-test-advertiser-panel"
+              class="card col s4 center-align py-2 px-4"
+            >
+              <h6 class="mb-4">Advertiser site iframe</h6>
+              <iframe
+                id="local-test-advertiser-iframe"
+                allow="join-ad-interest-group"
+                src="https://localhost:4001"
+              ></iframe>
+            </div>
+            <div
+              id="local-test-publisher-panel"
+              class="card col s4 center-align py-2 px-4"
+            >
+              <h6 class="mb-4">Publisher site iframe</h6>
+              <iframe
+                id="local-test-publisher-iframe"
+                allow="run-ad-auction"
+                src="https://localhost:4002"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration section -->
+        <div class="local-test-configuration-section">
+          <h5 class="mt-1 mb-4">Configuration</h5>
+          <div class="row g-2">
+            <div class="card col s6 py-2 px-4 pb-5">
+              <h6>Stack 1 information</h6>
+              <div class="row valign-wrapper mb-4">
+                <h6 class="col s1">SFE</h6>
+                <div class="input-field col s11">
+                  <input id="sfe-1" type="text" value="192.168.84.104:50053" />
+                  <label for="sfe-1">SFE 1 address</label>
+                </div>
+              </div>
+              <h6 class="mt-5 mb-4">Stack 1 CLI commands</h6>
+              <div class="card px-4">
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">Bid</h6>
+                  <p class="col s11">
+                    BIDDING_JS_URL="https://192.168.84.100:5003/generate-bid.js"
+                    ./tools/debug/start_bidding
+                  </p>
+                </div>
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">BFE</h6>
+                  <p class="col s11">
+                    BUYER_KV_SERVER_ADDR="https://192.168.84.100:5003/kv"
+                    ./tools/debug/start_bfe
+                  </p>
+                </div>
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">Auc</h6>
+                  <p class="col s11">
+                    AUCTION_JS_URL="https://192.168.84.100:6002/score-ad.js"
+                    ./tools/debug/start_auction
+                  </p>
+                </div>
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">SFE</h6>
+                  <p class="col s11">
+                    SELLER_ORIGIN_DOMAIN="https://localhost:6002"
+                    KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6002/kv"
+                    ./tools/debug/start_sfe
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="card col s6 py-2 px-4 pb-5">
+              <h6>Stack 2 information</h6>
+              <div class="row valign-wrapper">
+                <h6 class="col s1">SFE</h6>
+                <div class="input-field col s11">
+                  <input id="sfe-2" type="text" value="192.168.84.204:50053" />
+                  <label for="sfe-2">SFE 2 address</label>
+                </div>
+              </div>
+              <h6 class="mt-5 mb-4">Stack 2 CLI commands</h6>
+              <div class="card px-4">
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">Bid</h6>
+                  <p class="col s11">
+                    BIDDING_JS_URL="https://192.168.84.100:5004/generate-bid.js"
+                    ./tools/debug/start_bidding
+                  </p>
+                </div>
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">BFE</h6>
+                  <p class="col s11">
+                    BUYER_KV_SERVER_ADDR="https://192.168.84.100:5004/kv"
+                    ./tools/debug/start_bfe
+                  </p>
+                </div>
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">Auc</h6>
+                  <p class="col s11">
+                    AUCTION_JS_URL="https://192.168.84.100:6003/score-ad.js"
+                    ./tools/debug/start_auction
+                  </p>
+                </div>
+                <div class="row valign-wrapper">
+                  <h6 class="col s1">SFE</h6>
+                  <p class="col s11">
+                    SELLER_ORIGIN_DOMAIN="https://localhost:6003"
+                    KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6003/kv"
+                    ./tools/debug/start_sfe
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

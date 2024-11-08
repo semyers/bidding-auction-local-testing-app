@@ -1,0 +1,1 @@
+docker build -t ba-local-dev-console .

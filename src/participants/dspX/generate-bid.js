@@ -13,10 +13,19 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
- function scoreAd() {
+
+function generateBid(
+  interestGroup,
+  auctionSignals,
+  perBuyerSignals,
+  trustedBiddingSignals,
+  browserSignals
+) {
   return {
-    desirability: 1,
+    bid: Math.floor(Math.random() * 100),
+    render: 'https://localhost:5003/ad.html',
+    allowComponentAuction: !!browserSignals.topLevelSeller,
   };
 }
 
-function reportResult() {}
+function reportWin() {}
