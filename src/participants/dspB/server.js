@@ -14,11 +14,28 @@
  limitations under the License.
  */
 
- function generateBid() {
-  return {
-    bid: 1,
-    render: 'http://localhost:6000/ad.html'
-  }
-}
+import express from 'express';
+import morgan from 'morgan';
 
-function reportWin() {}
+const dspB = express();
+dspB.use(
+  morgan(
+    '[DSP-B] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+  )
+);
+
+dspB.use(
+  express.static('src/participants/dspB', {
+    setHeaders: (res, path) => {
+      if (path.includes('generate-bid.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
+
+      if (path.includes('ad.html')) {
+        res.set('Supports-Loading-Mode', 'fenced-frame');
+      }
+    },
+  })
+);
+
+export default dspB;

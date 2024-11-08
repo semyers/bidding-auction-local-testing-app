@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Publisher site</title>
+    <style>
+      @import url(//fonts.googleapis.com/css2?family=Google+Sans);
+
+      html {
+        font-family: 'Google Sans', arial, sans-serif;
+      }
+
+      body {
+        padding: 0px;
+        margin: 0px;
+        overflow: hidden;
+      }
+
+      iframe,
+      #ad {
+        border: none;
+        width: 300px;
+        height: 250px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      function appendSellerScript(scriptSrc) {
+        const scriptEl = document.createElement('script');
+        scriptEl.setAttribute('allow', 'run-ad-auction');
+        scriptEl.src = scriptSrc;
+
+        document.body.appendChild(scriptEl);
+      }
+
+      const queryParams = new URLSearchParams(window.location.search);
+
+      switch (queryParams.get('auctionType')) {
+        case 'single-seller-on-device':
+          appendSellerScript('https://localhost:6004/run-ad-auction.js');
+          break;
+
+        case 'single-seller-ba':
+          appendSellerScript('https://localhost:6002/run-ad-auction.js');
+          break;
+
+        case 'single-seller-mixed-mode':
+          appendSellerScript('https://localhost:6003/run-ad-auction.js');
+          break;
+
+        case 'multi-seller-mixed-mode':
+          appendSellerScript('https://localhost:6001/run-ad-auction.js');
+          break;
+      }
+    </script>
+  </body>
+</html>
