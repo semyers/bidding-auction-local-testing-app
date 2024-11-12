@@ -96,7 +96,7 @@ We will use the 4.3 release.
 Execute the following command from the root of each stack's repository to build the services: 
 
 ```bash
-> ./production/packaging/build_and_test_all_in_docker \
+./production/packaging/build_and_test_all_in_docker \
   --service-path bidding_service \
   --service-path auction_service \
   --service-path buyer_frontend_service \
@@ -120,7 +120,7 @@ This step may take up to 3 hours on an 8-core machine and an hour on a 32-core m
 Pull and build the service: 
 
 ```bash
-> git clone https://github.com/privacysandbox/bidding-auction-local-console.git
+> git clone https://github.com/privacysandbox/bidding-auction-local-dev-console.git
 > cd bidding-auction-local-dev-console
 > ./setup 
 ```
@@ -141,7 +141,7 @@ Make sure you have fully exited out of all Chrome instances before opening it fr
 
 ### Open the page in Chrome
 
-Visit the UI at https://localhost:3000 or your VM's address and `:3000`.  
+Visit the UI at http://localhost:3000 or your VM's address and `:3000`.  
 
 ### Start the services in local mode
 
@@ -154,23 +154,22 @@ Run the following commands in root folder of the first B&A Stack
 ##### DSP-X Bidding Service
 
 ```bash
-EXTRA_DOCKER_RUN_ARGS="--ip=192.168.84.101" \
 BIDDING_JS_URL="https://192.168.84.100:5003/generate-bid.js" \
-  ./tools/debug/start_bidding_ldc
+  ./tools/debug/start_bidding
 ```
 
 ##### DSP-X BFE Service
 
 ```bash
 BUYER_KV_SERVER_ADDR="https://192.168.84.100:5003/kv" \
-  ./tools/debug/start_bfe_ldc
+  ./tools/debug/start_bfe
 ```
 
 ##### SSP-X Auction Service 
 
 ```bash
 AUCTION_JS_URL="https://192.168.84.100:6002/score-ad.js" \
-  ./tools/debug/start_auction_ldc
+  ./tools/debug/start_auction
 ```
 
 ##### SSP-X SFE Service A
@@ -178,7 +177,7 @@ AUCTION_JS_URL="https://192.168.84.100:6002/score-ad.js" \
 ```bash
 SELLER_ORIGIN_DOMAIN="https://localhost:6002" \
 KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6002/kv" \
-  ./tools/debug/start_sfe_ldc
+  ./tools/debug/start_sfe
 ```
 
 #### Stack 2 (DSP-Y and SSP-Y)
@@ -189,21 +188,21 @@ Run the following commands in root folder of the second B&A Stack
 
 ```bash
 BIDDING_JS_URL="https://192.168.84.100:5004/generate-bid.js" \
-  ./tools/debug/start_bidding_ldc
+  ./tools/debug/start_bidding
 ```
 
 ##### DSP-Y BFE Service
 
 ```bash
 BUYER_KV_SERVER_ADDR="https://192.168.84.100:5004/kv" \
-  ./tools/debug/start_bfe_ldc
+  ./tools/debug/start_bfe
 ```
 
 ##### SSP-Y Auction Service
 
 ```bash
 AUCTION_JS_URL="https://192.168.84.100:6003/score-ad.js" \
-  ./tools/debug/start_auction_ldc
+  ./tools/debug/start_auction
 ```
 
 ##### SSP-Y SFE Service
@@ -211,7 +210,7 @@ AUCTION_JS_URL="https://192.168.84.100:6003/score-ad.js" \
 ```bash
 SELLER_ORIGIN_DOMAIN="https://localhost:6003" \
 KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6003/kv" \
-  ./tools/debug/start_sfe_ldc
+  ./tools/debug/start_sfe
 ```
 
 ## Design
