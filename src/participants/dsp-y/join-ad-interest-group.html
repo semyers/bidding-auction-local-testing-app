@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DSP-Y tag</title>
+    <script>
+      const kMillisecsPerDay = 1000 * 60 * 24;
+      const interestGroupConfig = {
+        name: 'dsp-y-demo',
+        owner: 'https://localhost:5004',
+        biddingLogicURL: 'https://localhost:5004/generate-bid.js',
+        ads: [
+          {
+            renderURL: 'https://localhost:5004/ad.html',
+            // Payload optimization
+            adRenderId: '1234',
+          },
+        ],
+        lifetimeMs: 30 * kMillisecsPerDay,
+        trustedBiddingSignalsKeys: ['demo-key'],
+        // Payload optimization
+        auctionServerRequestFlags: ['omit-ads', 'omit-user-bidding-signals'],
+      };
+
+      navigator.clearOriginJoinedAdInterestGroups(location.origin);
+      navigator.joinAdInterestGroup(interestGroupConfig);
+    </script>
+  </head>
+  <body></body>
+</html>

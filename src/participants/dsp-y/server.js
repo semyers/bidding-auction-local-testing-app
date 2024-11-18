@@ -15,18 +15,36 @@
  */
 
 /**
- * Publisher server
+ * Setup the DSP-Y B&A buyer server
  */
 import express from 'express';
 import morgan from 'morgan';
 
-const publisher = express();
-publisher.use(
+const dspY = express();
+dspY.use(
   morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[DSP-Y] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
-publisher.use(express.static('src/participants/publisher'));
+dspY.use(
+  express.static('src/participants/dsp-y', {
+    setHeaders: (res, path) => {
+      if (path.includes('generate-bid.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
 
-export default publisher;
+      if (path.includes('ad.html')) {
+        res.set('Supports-Loading-Mode', 'fenced-frame');
+      }
+    },
+  })
+);
+
+dspY.get('/kv', (req, res) => {
+  res.json({
+    keys: { 'demo-key': 'demo-value' },
+  });
+});
+
+export default dspY;

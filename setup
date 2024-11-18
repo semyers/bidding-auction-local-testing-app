@@ -2,12 +2,13 @@
 docker network create --driver=bridge --subnet=192.168.84.0/24 ba-dev 
 
 # Setup self-signed SSL certificates
-mkdir certs
+mkdir -p certs
 cd certs
 curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
 chmod +x mkcert-v*-linux-amd64
+./mkcert-v*-linux-amd64 -install
 ./mkcert-v*-linux-amd64 -cert-file localhost.pem -key-file localhost-key.pem localhost
-rm mkcert-v*-linux-amd64
+mkcert-v*-linux-amd64
 cd ..
 
 # Install app dependencie

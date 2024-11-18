@@ -15,18 +15,21 @@
  */
 
 /**
- * Publisher server
+ * Scoring logic for the SSP-TOP top-level seller for the multi-seller auction
+ *
+ * This file is fetched by the browser
  */
-import express from 'express';
-import morgan from 'morgan';
+function scoreAd(
+  adMetadata,
+  bid,
+  auctionConfig,
+  trustedScoringSignals,
+  browserSignals
+) {
+  return {
+    desirability: bid,
+    allowComponentAuction: true,
+  };
+}
 
-const publisher = express();
-publisher.use(
-  morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
-  )
-);
-
-publisher.use(express.static('src/participants/publisher'));
-
-export default publisher;
+function reportResult(auctionConfig, browserSignals) {}

@@ -1,5 +1,5 @@
 docker run -it --rm \
-  --name ba-ldc \
+  --name ba-lta \
   --network ba-dev \
   --ip 192.168.84.100 \
   --publish 3000:3000 \
@@ -13,5 +13,4 @@ docker run -it --rm \
   --publish 6002:6002 \
   --publish 6003:6003 \
   --publish 6004:6004 \
-  ba-local-dev-console
-
+  ba-local-testing-app

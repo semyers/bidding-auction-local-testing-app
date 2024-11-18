@@ -1,7 +1,7 @@
 {
-  "name": "bidding-auction-local-console",
+  "name": "bidding-auction-local-testing-app",
   "version": "0.1.0",
-  "description": "Local developer console for Bidding and Auction Services",
+  "description": "Local testing app for Bidding and Auction Services",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,11 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/privacysandbox/bidding-auction-local-console.git"
+    "url": "git+https://github.com/privacysandbox/bidding-auction-local-testing-app.git"
   },
   "author": "",
   "license": "ISC",
-  "homepage": "https://github.com/privacysandbox/bidding-auction-local-console#readme",
+  "homepage": "https://github.com/privacysandbox/bidding-auction-local-testing-app#readme",
   "dependencies": {
     "@grpc/grpc-js": "^1.12.2",
     "@grpc/proto-loader": "^0.7.13",

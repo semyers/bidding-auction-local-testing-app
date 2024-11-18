@@ -20,8 +20,24 @@
       textarea {
         font-family: 'Google Sans', arial, sans-serif;
       }
+
+      .container {
+        width: 90%;
+      }
+
+      #local-test-control-panel,
+      #local-test-advertiser-panel,
+      #local-test-publisher-panel {
+        height: 320px;
+      }
+
+      #local-test-advertiser-iframe,
+      #local-test-publisher-iframe {
+        border: 1px solid black;
+        width: 300px;
+        height: 250px;
+      }
     </style>
-    <link rel="stylesheet" href="index.css" />
     <script defer src="index.js"></script>
   </head>
 
@@ -34,27 +50,6 @@
     <!-- Page container -->
     <div class="container">
       <div id="local-test-container" class="card-panel mt-5">
-        <!-- Instructions section -->
-        <div id="local-test-demo-section" class="mb-5">
-          <h5 class="mt-1 mb-4">Instructions</h5>
-          <div class="row">
-            <div
-              id="local-test-instructions-panel"
-              class="card col s12 text-align py-2 px-4"
-            >
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Phasellus mollis ante non leo venenatis, nec ultricies ante
-                vulputate. Sed quam neque, dictum eget leo et, consequat
-                interdum diam. Phasellus bibendum tincidunt erat. Maecenas
-                malesuada auctor mauris, et commodo tellus lacinia in. Duis
-                auctor elit nec nulla finibus mollis. Morbi eget lectus mauris.
-                Vivamus tincidunt erat a mi aliquet tempus.
-              </p>
-            </div>
-          </div>
-        </div>
-
         <!-- Demo section -->
         <div id="local-test-demo-section" class="mb-5">
           <h5 class="mt-1 mb-4">Demo</h5>

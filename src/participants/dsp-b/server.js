@@ -15,18 +15,30 @@
  */
 
 /**
- * Publisher server
+ * Setup the DSP-B on-device buyer server
  */
 import express from 'express';
 import morgan from 'morgan';
 
-const publisher = express();
-publisher.use(
+const dspB = express();
+dspB.use(
   morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[DSP-B] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
-publisher.use(express.static('src/participants/publisher'));
+dspB.use(
+  express.static('src/participants/dsp-b', {
+    setHeaders: (res, path) => {
+      if (path.includes('generate-bid.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
 
-export default publisher;
+      if (path.includes('ad.html')) {
+        res.set('Supports-Loading-Mode', 'fenced-frame');
+      }
+    },
+  })
+);
+
+export default dspB;

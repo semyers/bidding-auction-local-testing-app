@@ -1,15 +1,15 @@
-From 2341478a3a29b39aebb26591cb3256bcce7bf656 Mon Sep 17 00:00:00 2001
+From a87ef3bf7b07a689726f118f818dec991eb14100 Mon Sep 17 00:00:00 2001
 From: "Kevin K. Lee" <kevinkiklee@google.com>
 Date: Fri, 8 Nov 2024 14:56:21 +0000
 Subject: [PATCH] Update start-up scripts
 
 ---
- .../http/multi_curl_http_fetcher_async.cc     |  5 ++++-
- tools/debug/start_auction                     |  7 ++++---
- tools/debug/start_bfe                         |  7 ++++---
- tools/debug/start_bidding                     |  7 ++++---
- tools/debug/start_sfe                         | 21 ++++++++++++-------
- 5 files changed, 29 insertions(+), 18 deletions(-)
+ .../http/multi_curl_http_fetcher_async.cc     |  5 +++-
+ tools/debug/start_auction                     |  7 +++---
+ tools/debug/start_bfe                         |  9 ++++----
+ tools/debug/start_bidding                     |  7 +++---
+ tools/debug/start_sfe                         | 23 +++++++++++--------
+ 5 files changed, 31 insertions(+), 20 deletions(-)
 
 diff --git a/services/common/clients/http/multi_curl_http_fetcher_async.cc b/services/common/clients/http/multi_curl_http_fetcher_async.cc
 index ee9bbc4..6b60a89 100644
@@ -60,10 +60,16 @@ index 70ca3b9..2bc427b 100755
        "--security-opt=apparmor=unconfined"
    )
 diff --git a/tools/debug/start_bfe b/tools/debug/start_bfe
-index 5e752db..33f0f12 100755
+index 5e752db..2ce3890 100755
 --- a/tools/debug/start_bfe
 +++ b/tools/debug/start_bfe
-@@ -21,7 +21,7 @@ export BUYER_KV_SERVER_ADDR=""
+@@ -16,12 +16,12 @@
+ source $(dirname "$0")/common
+ export EXTRA_DOCKER_RUN_ARGS="${COMMON_DOCKER_RUN_ARGS[@]} ${DOCKER_RUN_ARGS[@]}"
+ 
+-export BUYER_KV_SERVER_ADDR=""
++# export BUYER_KV_SERVER_ADDR=""
+ 
  export SERVER_START_CMD=$(cat << END
  /server/bin/server \
  --init_config_client="false" --port=50051 \
@@ -124,15 +130,17 @@ index cbdd02d..c0e0358 100755
        "--security-opt=apparmor=unconfined"
    )
 diff --git a/tools/debug/start_sfe b/tools/debug/start_sfe
-index 0f2bd91..d186fea 100755
+index 0f2bd91..c9b8a61 100755
 --- a/tools/debug/start_sfe
 +++ b/tools/debug/start_sfe
-@@ -16,19 +16,23 @@
+@@ -15,20 +15,24 @@
+ 
  source $(dirname "$0")/common
  
- export BUYER_SERVER_HOST=""
+-export BUYER_SERVER_HOST=""
 -export KEY_VALUE_SIGNALS_HOST=""
 -export SELLER_ORIGIN_DOMAIN=""
++# export BUYER_SERVER_HOST=""
 +# export KEY_VALUE_SIGNALS_HOST=""
 +# export SELLER_ORIGIN_DOMAIN=""
  
@@ -180,5 +188,5 @@ index 0f2bd91..d186fea 100755
        "--security-opt=apparmor=unconfined"
    )
 -- 
-2.47.0.277.g8800431eea-goog
+2.47.0.338.g60cca15819-goog
 

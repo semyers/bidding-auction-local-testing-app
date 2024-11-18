@@ -15,18 +15,37 @@
  */
 
 /**
- * Publisher server
+ * Setup the DSP-X B&A buyer server
  */
 import express from 'express';
 import morgan from 'morgan';
 
-const publisher = express();
-publisher.use(
+const dspX = express();
+
+dspX.use(
   morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[DSP-X] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
-publisher.use(express.static('src/participants/publisher'));
+dspX.use(
+  express.static('src/participants/dsp-x', {
+    setHeaders: (res, path) => {
+      if (path.includes('generate-bid.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
 
-export default publisher;
+      if (path.includes('ad.html')) {
+        res.set('Supports-Loading-Mode', 'fenced-frame');
+      }
+    },
+  })
+);
+
+dspX.get('/kv', (req, res) => {
+  res.json({
+    keys: { 'demo-key': 'demo-value' },
+  });
+});
+
+export default dspX;

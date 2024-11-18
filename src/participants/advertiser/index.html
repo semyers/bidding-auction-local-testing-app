@@ -1,3 +1,9 @@
+<!-- 
+ Setup the advertiser page
+
+ The advertiser page loads the DSP tags on the page. 
+ The DSP tags adds the user to an interest group. 
+-->
 <!doctype html>
 <html lang="en">
   <head>
@@ -26,10 +32,10 @@
     <script>
       function loadDspTags() {
         [
-          'https://localhost:5001/join-ad-interest-group.html',
-          'https://localhost:5002/join-ad-interest-group.html',
-          'https://localhost:5003/join-ad-interest-group.html',
-          'https://localhost:5004/join-ad-interest-group.html',
+          'https://localhost:5001/join-ad-interest-group.html', // DSP-A on-device byer
+          'https://localhost:5002/join-ad-interest-group.html', // DSP-B on-device buyer
+          'https://localhost:5003/join-ad-interest-group.html', // DSP-X B&A buyer
+          'https://localhost:5004/join-ad-interest-group.html', // DSP-Y B&A buyer
         ].forEach((tagUrl) => {
           const iframeEl = document.createElement('iframe');
           iframeEl.setAttribute('allow', 'join-ad-interest-group');

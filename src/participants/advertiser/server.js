@@ -14,6 +14,12 @@
  limitations under the License.
  */
 
+/**
+ * Setup the advertiser server
+ *
+ * The only function of this server is to server the advertiser page
+ */
+
 import express from 'express';
 import morgan from 'morgan';
 

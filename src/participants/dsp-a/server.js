@@ -15,18 +15,30 @@
  */
 
 /**
- * Publisher server
+ * Setup the DSP-A on-device buyer server
  */
 import express from 'express';
 import morgan from 'morgan';
 
-const publisher = express();
-publisher.use(
+const dspA = express();
+dspA.use(
   morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[App] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
-publisher.use(express.static('src/participants/publisher'));
+dspA.use(
+  express.static('src/participants/dsp-a', {
+    setHeaders: (res, path) => {
+      if (path.includes('generate-bid.js')) {
+        res.set('Ad-Auction-Allowed', 'true');
+      }
 
-export default publisher;
+      if (path.includes('ad.html')) {
+        res.set('Supports-Loading-Mode', 'fenced-frame');
+      }
+    },
+  })
+);
+
+export default dspA;

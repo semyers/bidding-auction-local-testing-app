@@ -1,21 +1,38 @@
-# bidding-auction-dev-local-console
+# bidding-auction-local-testing-app
 
 ![](./docs/app-introduction.gif)
 
-Local developer console for Bidding and Auction Services
+Local Testing App for Bidding and Auction Services
+
+## Description
+
+The B&A Local Testing App (LTA) is a companion application to Bidding & Auction Service for Privacy Sandbox, and runs locally alongside the B&A Services stacks on your machine or VM. 
+
+To ease the B&A testing process, the LTA provides the following participants: 
+* DSPs 
+  * On-device-only auctions: `DSP-A` and `DSP-B`
+  * B&A-only auctions: `DSP-X` and `DSP-Y`
+* SSPs 
+  * On-device-only auction: `SSP-O` ([Logic](aidaa))
+  * B&A-only auction: `SSP-X` ([Logic](aidaa))
+  * Mixed-mode auction: `SSP-Y` ([Logic](aidaa))
+  * Multi-seller auction: `SSP-TOP` ([Logic](aidaa))
+
+Each participant provides mock bidding/scoring logic for B&A running locally can use.
+
+After starting all the services and LTA, you can visit localhost:3000 to run different auction configurations such as mixed-mode and multi-seller auctions.
 
 ## Quickstart
 
 TL;DR: 
-1. Install prerequisites
+1. Setup prerequisites
 2. Setup repositories
 3. Build the services
 4. Build and start the local companion app
 5. Start the services
-6. ???
-7. $$$
+6. Visit localhost:3000, click "Load DSP tags", and click "Run auction" button
 
-### Install prerequisites
+### Setup prerequisites
 
 #### Prepare a linux machine
 
@@ -39,34 +56,27 @@ Use a linux local machine, or provision a linux VM of the cloud provider of your
 
 > With the sudo-less setup, the docker group grants root-level privileges to the user. Read the [sudo-less Docker](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) guide to learn more. 
 
-#### Install Node 
-
-The following commands installs `node` using `nvm`: 
-
-```bash
-> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-> nvm install --lts
-> node -v
-```
-
-Doc: [Detailed `nvm` installation instruction](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)
-
 ### Setup the services
 
 #### Pull down the Bidding and Auction Services repository
 
 For our demo, we will be using two stacks of B&A to simulate auctions involving multiple buyers and sellers. 
 
+Stack 1: 
 ```bash
-> git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-1
-> git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-2
+git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-1
+```
+
+Stack 2: 
+```bash
+git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-2
 ```
 
 ##### Apply Git patch
 
 > This is a temporary step that won't be necessary in 4.5+ release in the future
 
-There are some changes we need to the B&A code to allow the local companion app to run. The changes in this patch will be included in a future B&A release, and the patch will not be necessary then. 
+There are some changes we need to make to the B&A code to allow the local testing app to run. The changes in this patch will be included in a future B&A release, and the patch will not be necessary then. 
 
 We will use the 4.3 release. 
 
@@ -115,19 +125,25 @@ This step may take up to 3 hours on an 8-core machine and an hour on a 32-core m
 
 <img src="https://imgs.xkcd.com/comics/compiling.png" alt="drawing" width="300"/>
 
-### Build and run local development companion app
+### Build and run Local Testing App
 
-Pull and build the service: 
+Pull down this repository: 
 
 ```bash
-> git clone https://github.com/privacysandbox/bidding-auction-local-dev-console.git
-> cd bidding-auction-local-dev-console
-> ./setup 
+git clone https://github.com/privacysandbox/bidding-auction-local-testing-app.git
 ```
-Start the service:
+
+From the root folder of the repo, run the following: 
+
+Setup the app: 
+```
+./setup 
+```
+
+Start the app:
 
 ```bash
-> ./start
+./start
 ```
 
 ### Open Chrome
@@ -137,6 +153,8 @@ Start Chrome from the command line with the following flags:
 google-chrome --enable-privacy-sandbox-ads-apis --disable-features=EnforcePrivacySandboxAttestations,FledgeEnforceKAnonymity --enable-features=FledgeBiddingAndAuctionServerAPI,FledgeBiddingAndAuctionServer:FledgeBiddingAndAuctionKeyURL/https%3A%2F%2Fstorage.googleapis.com%2Fba-test-buyer%2Fcoordinator-test-key.json 
 ```
 
+The flag is set to let Chrome know to use the mock coordinator key that we have hosted at [https://storage.googleapis.com/ba-test-buyer/coordinator-test-key.json](https://storage.googleapis.com/ba-test-buyer/coordinator-test-key.json)
+
 Make sure you have fully exited out of all Chrome instances before opening it from the command line with the B&A flags. 
 
 ### Open the page in Chrome
@@ -145,7 +163,7 @@ Visit the UI at http://localhost:3000 or your VM's address and `:3000`.
 
 ### Start the services in local mode
 
-Execute each command in a separate terminal window. 
+Execute each command in a separate terminal window. A window manager such a [`tmux`](https://github.com/tmux/tmux/wiki) is highly recommended.
 
 #### Stack 1 (DSP-X and SSP-X)
 
@@ -235,12 +253,46 @@ The demo runs the following set of auctions:
 
 ![](./docs/architecture.png)
 
-* App UI - https://localhost:3000 / https://192.168.84.100:3000
-* SSP-TOP - https://localhost:4001 / https://192.168.84.100:4001
-* SSP-X - https://localhost:4002 / https://192.168.84.100:4002
-* SSP-Y - https://localhost:4003 / https://192.168.84.100:4003
-* SSP-O - https://localhost:4004 / https://192.168.84.100:4004
-* DSP-A - https://localhost:5001 / https://192.168.84.100:5001
-* DSP-B - https://localhost:5002 / https://192.168.84.100:5002
-* DSP-X - https://localhost:5003 / https://192.168.84.100:5003
-* DSP-Y - https://localhost:5004 / https://192.168.84.100:5004
+* Advertiser - https://localhost:4001
+* Publisher - https://localhost:4002
+* DSP-A - https://localhost:5001
+* DSP-B - https://localhost:5002
+* DSP-X - https://localhost:5003
+* DSP-Y - https://localhost:5004
+* SSP-TOP - https://localhost:6001
+* SSP-X - https://localhost:6002
+* SSP-Y - https://localhost:6003
+* SSP-O - https://localhost:6004
+
+### Docker network
+
+The B&A stacks and the application communicate over the `ba-dev` Docker bridge network with the subnet of `192.168.84.0/24` ("84" represents "BA").  
+
+To examine the `ba-dev` network, run `docker network inspect ba-dev` in the command line.
+
+#### Auction participants
+
+* Advertiser - https://192.168.84.100:4001
+* Publisher - https://192.168.84.100:4002
+* DSP-A - https://192.168.84.100:5001
+* DSP-B - https://192.168.84.100:5002
+* DSP-X - https://192.168.84.100:5003
+* DSP-Y - https://192.168.84.100:5004
+* SSP-TOP - https://192.168.84.100:6001
+* SSP-X - https://192.168.84.100:6002
+* SSP-Y - https://192.168.84.100:6003
+* SSP-O - https://192.168.84.100:6004
+
+#### B&A Services
+
+* Stack 1
+  * BidServ-1 - http://192.168.84.100:50057
+  * BFE-1 - http://192.168.84.101:50051
+  * AucServ-1 - http://192.168.84.102:50061
+  * SFE-1 - http://192.168.84.103:50053
+
+Stack 2
+  * BidServ-2 - http://192.168.84.201:50057
+  * BFE-2 - http://192.168.84.202:50051
+  * AucServ-2 - http://192.168.84.203:50061
+  * SFE-2 - http://192.168.84.204:50053

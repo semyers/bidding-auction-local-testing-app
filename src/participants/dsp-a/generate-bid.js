@@ -12,21 +12,23 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- */
+*/
 
 /**
- * Publisher server
+ * Bid generation logic for the DSP-A on-device buyer
  */
-import express from 'express';
-import morgan from 'morgan';
+function generateBid(
+  interestGroup,
+  auctionSignals,
+  perBuyerSignals,
+  trustedBiddingSignals,
+  browserSignals
+) {
+  return {
+    bid: Math.floor(Math.random() * 100),
+    render: 'https://localhost:5001/ad.html',
+    allowComponentAuction: !!browserSignals.topLevelSeller,
+  };
+}
 
-const publisher = express();
-publisher.use(
-  morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
-  )
-);
-
-publisher.use(express.static('src/participants/publisher'));
-
-export default publisher;
+function reportWin() {}

@@ -15,18 +15,26 @@
  */
 
 /**
- * Publisher server
+ * SSP-O on-device-only seller
  */
 import express from 'express';
 import morgan from 'morgan';
 
-const publisher = express();
-publisher.use(
+const sspO = express();
+sspO.use(
   morgan(
-    '[Publisher] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[SSP-O] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
-publisher.use(express.static('src/participants/publisher'));
+sspO.use(
+  express.static('src/participants/ssp-o', {
+    setHeaders: (res, path) => {
+      if (path.includes('score-ad.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
+    },
+  })
+);
 
-export default publisher;
+export default sspO;

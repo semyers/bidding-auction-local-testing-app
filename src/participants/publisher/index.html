@@ -37,20 +37,26 @@
 
       const queryParams = new URLSearchParams(window.location.search);
 
+      // Add the SSP scripts based on the auction type query param
+      // The query param comes from the "Run auction" buttons on the main app page
       switch (queryParams.get('auctionType')) {
         case 'single-seller-on-device':
+          // SSP-O script
           appendSellerScript('https://localhost:6004/run-ad-auction.js');
           break;
 
         case 'single-seller-ba':
+          // SSP-X script
           appendSellerScript('https://localhost:6002/run-ad-auction.js');
           break;
 
         case 'single-seller-mixed-mode':
+          // SSP-Y script
           appendSellerScript('https://localhost:6003/run-ad-auction.js');
           break;
 
         case 'multi-seller-mixed-mode':
+          // SSP-Top script
           appendSellerScript('https://localhost:6001/run-ad-auction.js');
           break;
       }

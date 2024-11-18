@@ -1,1 +1,1 @@
-docker build -t ba-local-dev-console .
+docker build -t ba-local-testing-app .

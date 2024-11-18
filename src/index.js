@@ -14,6 +14,13 @@
  limitations under the License.
  */
 
+/**
+ * Setup the app server and the B&A participant servers.
+ *
+ * This file contains the logic for the testing app,
+ * and does not contain Protected Audience logic.
+ */
+
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
@@ -21,14 +28,14 @@ import https from 'https';
 import app from './app/server.js';
 import advertiser from './participants/advertiser/server.js';
 import publisher from './participants/publisher/server.js';
-import sspTop from './participants/sspTop/server.js';
-import sspX from './participants/sspX/server.js';
-import sspY from './participants/sspY/server.js';
-import sspO from './participants/sspO/server.js';
-import dspA from './participants/dspA/server.js';
-import dspB from './participants/dspB/server.js';
-import dspX from './participants/dspX/server.js';
-import dspY from './participants/dspY/server.js';
+import sspTop from './participants/ssp-top/server.js';
+import sspX from './participants/ssp-x/server.js';
+import sspY from './participants/ssp-y/server.js';
+import sspO from './participants/ssp-o/server.js';
+import dspA from './participants/dsp-a/server.js';
+import dspB from './participants/dsp-b/server.js';
+import dspX from './participants/dsp-x/server.js';
+import dspY from './participants/dsp-y/server.js';
 
 const APP_PORT = 3000;
 const ADVERTISER_PORT = 4001;
@@ -47,7 +54,10 @@ const serverOptions = {
   cert: fs.readFileSync('certs/localhost.pem'),
 };
 
+// The app itself is on http
 http.createServer(app).listen(APP_PORT);
+
+// The PA auction participants are on https
 https.createServer(serverOptions, advertiser).listen(ADVERTISER_PORT);
 https.createServer(serverOptions, publisher).listen(PUBLISHER_PORT);
 https.createServer(serverOptions, dspA).listen(DSP_A_PORT);
@@ -79,4 +89,4 @@ console.log(`SSP-X server available at https://localhost:${SSP_X_PORT}`);
 console.log(`SSP-Y server available at https://localhost:${SSP_Y_PORT}`);
 console.log(`SSP-O server available at https://localhost:${SSP_O_PORT}`);
 console.log('---');
-console.log(`Open http://localhost:3000 in the browser`)
+console.log(`Open http://localhost:3000 in the browser`);
