@@ -21,12 +21,12 @@ import morgan from 'morgan';
 
 import createSfeClient from './sfe-client/index.js';
 
-const sspX = express();
-sspX.use(express.json());
-sspX.use(cors());
-sspX.use(
+const sspMix = express();
+sspMix.use(express.json());
+sspMix.use(cors());
+sspMix.use(
   morgan(
-    '[SSP-X] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
@@ -56,17 +56,22 @@ function decodeRequest(auctionRequest) {
 /**
  * Server-side B&A ad auction
  */
-sspX.post('/ad-auction', (req, res) => {
+sspMix.post('/ad-auction', (req, res) => {
   const {
     adAuctionRequest, // Encrypted payload from the client. Base64 encoded.
     sfeAddress, // SFE address supplied by the app UI
     isComponentAuction, // A flag set by the demo
   } = req.body;
 
-  // SFE SelectAd request payload
   const selectAdRequest = {
     auction_config: {
-      seller: 'https://localhost:6002', // SSP-X B&A seller
+      // For the single-seller mixed-mode auction, the top-level seller is the
+      // same as the single-seller SSP-MIX. For the multi-seller auction, the top-level
+      // seller is SSP-TOP
+      top_level_seller: isComponentAuction
+        ? 'https://localhost:6001' // SSP-TOP top-level seller
+        : 'https://localhost:6003', // SSP-MIX mixed-mode seller
+      seller: 'https://localhost:6003', // SSP-MIX mixed-mode seller
       auction_signals: '{"testKey":"someValue"}',
       seller_signals: '{"testKey":"someValue"}',
       buyer_list: [
@@ -83,19 +88,13 @@ sspX.post('/ad-auction', (req, res) => {
     protected_auction_ciphertext: decodeRequest(adAuctionRequest),
   };
 
-  // If this auction is a part of a multi-seller auction, then the
-  // top-level seller is filled out
-  if (isComponentAuction) {
-    selectAdRequest.auction_config.top_level_seller = 'https://localhost:6001'; // SSP-TOP
-  }
-
-  // Create gRPC client for Stack 1 SFE
+  // Create gRPC client for Stack 2 SFE
   const sfeClient = createSfeClient(sfeAddress);
 
   // Call SelectAd
   sfeClient.selectAd(selectAdRequest, (error, response) => {
     if (!response) {
-      console.log('[SSP-X SFE client error] ', error);
+      console.log('[SSP-MIX SFE client] !!! ', error);
       return;
     }
 
@@ -114,16 +113,26 @@ sspX.post('/ad-auction', (req, res) => {
     res.json({ serverAdAuctionResponse });
 
     console.log(
-      `[SSP-X] Encoded serverAdAuctionResponse - ${serverAdAuctionResponse}`
+      `[SSP-MIX] Encoded serverAdAuctionResponse - ${serverAdAuctionResponse}`
     );
-    console.log(`[SSP-X] Ad-Auction-Result hash - ${ciphertextShaHash}`);
+    console.log(`[SSP-MIX] Ad-Auction-Result hash - ${ciphertextShaHash}`);
   });
 });
 
+sspMix.use(
+  express.static('src/participants/ssp-mix', {
+    setHeaders: (res, path) => {
+      if (path.includes('score-ad.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
+    },
+  })
+);
+
 /**
- * Mock SSP-X K/V BYOB server
+ * Mock SSP-MIX K/V BYOB server
  */
-sspX.get('/kv', (req, res) => {
+sspMix.get('/kv', (req, res) => {
   res.setHeader('Ad-Auction-Allowed', true);
 
   res.json({
@@ -134,6 +143,4 @@ sspX.get('/kv', (req, res) => {
   });
 });
 
-sspX.use(express.static('src/participants/ssp-x'));
-
-export default sspX;
+export default sspMix;

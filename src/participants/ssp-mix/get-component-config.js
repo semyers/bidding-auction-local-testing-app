@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-async function runSspYAuction() {
+async function runSspMixAuction() {
   class AdAuction {
     constructor(sfeAddress) {
       this.sfeAddress = sfeAddress;
@@ -94,7 +94,7 @@ async function runSspYAuction() {
   const adAuction = new AdAuction(sfeAddress);
   const auctionConfig = await adAuction.getConfig();
 
-  window.multiSellerAdAuction.setComponentAuctionConfig('sspY', auctionConfig);
+  window.multiSellerAdAuction.setComponentAuctionConfig('sspMix', auctionConfig);
 }
 
-runSspYAuction();
+runSspMixAuction();

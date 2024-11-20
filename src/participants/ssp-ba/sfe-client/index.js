@@ -21,7 +21,7 @@ import protoLoader from '@grpc/proto-loader';
 // Path of the SFE proto file
 const protoPath = path.join(
   path.resolve(),
-  'src/participants/ssp-y/sfe-client/client.proto'
+  'src/participants/ssp-ba/sfe-client/client.proto'
 );
 
 // Load the proto file
@@ -38,9 +38,9 @@ const {
 } = grpc.loadPackageDefinition(packageDefinition);
 
 /**
- * Create the gRPC client for SFE Stack 2
+ * Create the gRPC client for SFE Stack 1
  *
- * @param {string} sfeAddress Local network address of the SFE Stack 2
+ * @param {string} sfeAddress Local network address of the SFE Stack 1
  * @returns gRPC client
  */
 function createSfeClient(sfeAddress) {

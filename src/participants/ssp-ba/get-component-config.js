@@ -15,9 +15,9 @@
  */
 
 /**
- * Provide SSP-X B&A-only component auction config
+ * Provide SSP-BA B&A-only component auction config
  */
-async function runSspXAuction() {
+async function runSspBAAuction() {
   class AdAuction {
     // The SFE network address is supplied by the App UI
     constructor(sfeAddress) {
@@ -35,7 +35,7 @@ async function runSspXAuction() {
       const serverAdAuctionResult = await this.#runServerAdAuction(request);
 
       return {
-        seller: 'https://localhost:6002', // SSP-X B&A seller
+        seller: 'https://localhost:6002', // SSP-BA B&A seller
         requestId,
         serverResponse: serverAdAuctionResult,
       };
@@ -51,7 +51,7 @@ async function runSspXAuction() {
      */
     #getAdAuctionData() {
       const serverAdAuctionDataConfig = {
-        seller: 'https://localhost:6002', // SSP-X B&A-only seller
+        seller: 'https://localhost:6002', // SSP-BA B&A-only seller
         requestSize: 51200,
         perBuyerConfig: {
           'https://localhost:5003': { targetSize: 8192 }, // DSP-X B&A buyer
@@ -133,7 +133,7 @@ async function runSspXAuction() {
   const auctionConfig = await adAuction.getConfig();
 
   // Send the component auction config to the top-level seller
-  window.multiSellerAdAuction.setComponentAuctionConfig('sspX', auctionConfig);
+  window.multiSellerAdAuction.setComponentAuctionConfig('sspBA', auctionConfig);
 }
 
-runSspXAuction();
+runSspBAAuction();

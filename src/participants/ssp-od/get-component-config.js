@@ -17,11 +17,11 @@
 /**
  * Provide the on-device component auction config to the top-level seller
  */
-function runSspOAuction() {
+function runSspODAuction() {
   class AdAuction {
     getConfig() {
       return {
-        seller: 'https://localhost:6004', // SSP-O on-device seller
+        seller: 'https://localhost:6004', // SSP-OD on-device seller
         interestGroupBuyers: [
           'https://localhost:5001', // DSP-A on-device buyer
           'https://localhost:5002', // DSP-B on-device buyer
@@ -35,7 +35,7 @@ function runSspOAuction() {
   const auctionConfig = adAuction.getConfig();
 
   // The config is submitted to the top-level seller
-  window.multiSellerAdAuction.setComponentAuctionConfig('sspO', auctionConfig);
+  window.multiSellerAdAuction.setComponentAuctionConfig('sspOD', auctionConfig);
 }
 
-runSspOAuction();
+runSspODAuction();

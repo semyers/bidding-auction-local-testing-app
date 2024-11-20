@@ -15,9 +15,9 @@
  */
 
 /**
- * Run the SSP-X B&A-only auction
+ * Run the SSP-BA B&A-only auction
  */
-function runSspXAuction() {
+function runSspBAAuction() {
   class AdAuction {
     // The SFE network address is supplied by the App UI
     constructor(sfeAddress) {
@@ -50,16 +50,16 @@ function runSspXAuction() {
       this.#renderAd(clientAdAuctionResult);
 
       // Logs
-      console.log('[SSP-X] Server-side ad auction data - ', {
+      console.log('[SSP-BA] Server-side ad auction data - ', {
         request,
         requestId,
       });
       console.log(
-        '[SSP-X] Server-side ad auction result - ',
+        '[SSP-BA] Server-side ad auction result - ',
         serverAdAuctionResult
       );
       console.log(
-        '[SSP-X] Client-side ad auction result - ',
+        '[SSP-BA] Client-side ad auction result - ',
         clientAdAuctionResult
       );
     }
@@ -74,7 +74,7 @@ function runSspXAuction() {
      */
     #getAdAuctionData() {
       const adAuctionDataConfig = {
-        seller: 'https://localhost:6002', // SSP-X B&A-only seller
+        seller: 'https://localhost:6002', // SSP-BA B&A-only seller
         requestSize: 51200,
         perBuyerConfig: {
           'https://localhost:5003': { targetSize: 8192 }, // DSP-X B&A buyer
@@ -129,13 +129,13 @@ function runSspXAuction() {
      */
     #runClientAdAuction(requestId, serverAdAuctionResult) {
       const auctionConfig = {
-        seller: 'https://localhost:6002', // SSP-X B&A seller
+        seller: 'https://localhost:6002', // SSP-BA B&A seller
         resolveToConfig: true,
         requestId,
         serverResponse: serverAdAuctionResult,
       };
 
-      console.log('[SSP-X] Auction config - ', auctionConfig);
+      console.log('[SSP-BA] Auction config - ', auctionConfig);
 
       return navigator.runAdAuction(auctionConfig);
     }
@@ -189,4 +189,4 @@ function runSspXAuction() {
   adAuction.run();
 }
 
-runSspXAuction();
+runSspBAAuction();

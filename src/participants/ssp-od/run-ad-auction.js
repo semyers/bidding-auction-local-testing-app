@@ -17,14 +17,14 @@
 /**
  * Run the on-device Protected Audience auction
  */
-function runSspOAuction() {
+function runSspODAuction() {
   class AdAuction {
     /**
      * Run the on-device PA auction
      */
     async run() {
       const auctionResult = await navigator.runAdAuction({
-        seller: 'https://localhost:6004', // SSP-O on-device seller
+        seller: 'https://localhost:6004', // SSP-OD on-device seller
         interestGroupBuyers: [
           'https://localhost:5001', // DSP-A on-device buyer
           'https://localhost:5002', // DSP-B on-device buyer
@@ -54,4 +54,4 @@ function runSspOAuction() {
   adAuction.run();
 }
 
-runSspOAuction();
+runSspODAuction();

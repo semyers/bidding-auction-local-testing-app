@@ -15,21 +15,26 @@
  */
 
 /**
- * Scoring logic for the SSP-O on-device seller
- *
- * This file is fetched by the browser
+ * SSP-OD on-device-only seller
  */
-function scoreAd(
-  adMetadata,
-  bid,
-  auctionConfig,
-  trustedScoringSignals,
-  browserSignals
-) {
-  return {
-    desirability: bid,
-    allowComponentAuction: true,
-  };
-}
+import express from 'express';
+import morgan from 'morgan';
 
-function reportResult(auctionConfig, browserSignals) {}
+const sspOD = express();
+sspOD.use(
+  morgan(
+    '[SSP-OD] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+  )
+);
+
+sspOD.use(
+  express.static('src/participants/ssp-od', {
+    setHeaders: (res, path) => {
+      if (path.includes('score-ad.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
+    },
+  })
+);
+
+export default sspOD;

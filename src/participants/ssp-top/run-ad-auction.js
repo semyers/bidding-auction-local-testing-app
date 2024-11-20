@@ -50,21 +50,21 @@ class MultiSellerAdAuction {
    */
   async #run() {
     const auctionConfig = {
-      // SSP-O on-device seller
+      // SSP-OD on-device seller
       seller: 'https://localhost:6001',
       decisionLogicUrl: 'https://localhost:6001/score-ad.js',
       // The component auction configs are submitted by the component sellers
       // calling window.multiSellerAdAuction.setComponentAuctionConfig()
       componentAuctions: [
-        // SSP-O on-device-only component auction
-        this.#componentAuctionConfigs.sspO,
+        // SSP-OD on-device-only component auction
+        this.#componentAuctionConfigs.sspOD,
 
-        // SSP-X B&A-only component auction
-        this.#componentAuctionConfigs.sspX,
+        // SSP-BA B&A-only component auction
+        this.#componentAuctionConfigs.sspBA,
 
-        // SSP-Y mixed-mode component auction
-        // SSP-Y submits two configs, one for on-device and one for B&A
-        ...this.#componentAuctionConfigs.sspY,
+        // SSP-MIX mixed-mode component auction
+        // SSP-MIX submits two configs, one for on-device and one for B&A
+        ...this.#componentAuctionConfigs.sspMix,
       ],
       resolveToConfig: true,
     };
@@ -94,9 +94,9 @@ class MultiSellerAdAuction {
 window.multiSellerAdAuction = new MultiSellerAdAuction();
 
 const sspScriptUrls = [
-  'https://localhost:6002/get-component-config.js', // SSP-X B&A-only seller
-  'https://localhost:6003/get-component-config.js', // SSP-Y mixed-mode seller
-  'https://localhost:6004/get-component-config.js', // SSP-O on-device-only seller
+  'https://localhost:6002/get-component-config.js', // SSP-BA B&A-only seller
+  'https://localhost:6003/get-component-config.js', // SSP-MIX mixed-mode seller
+  'https://localhost:6004/get-component-config.js', // SSP-OD on-device-only seller
 ];
 
 // Load each component seller's script

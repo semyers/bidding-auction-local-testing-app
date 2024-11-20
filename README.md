@@ -13,9 +13,9 @@ To ease the B&A testing process, the LTA provides the following participants:
   * On-device-only auctions: `DSP-A` and `DSP-B`
   * B&A-only auctions: `DSP-X` and `DSP-Y`
 * SSPs 
-  * On-device-only auction: `SSP-O` ([Logic](aidaa))
-  * B&A-only auction: `SSP-X` ([Logic](aidaa))
-  * Mixed-mode auction: `SSP-Y` ([Logic](aidaa))
+  * On-device-only auction: `SSP-OD` ([Logic](aidaa))
+  * B&A-only auction: `SSP-BA` ([Logic](aidaa))
+  * Mixed-mode auction: `SSP-MIX` ([Logic](aidaa))
   * Multi-seller auction: `SSP-TOP` ([Logic](aidaa))
 
 Each participant provides mock bidding/scoring logic for B&A running locally can use.
@@ -45,13 +45,13 @@ Use a linux local machine, or provision a linux VM of the cloud provider of your
 > curl -fsSL https://get.docker.com -o get-docker.sh
 > sudo sh get-docker.sh
 
+# Test
+> docker run hello-world
+
 # Setup sudo-less Docker
 > sudo groupadd docker
 > sudo usermod -aG docker $USER
 > newgrp docker
-
-# Test
-> docker run hello-world
 ```
 
 > With the sudo-less setup, the docker group grants root-level privileges to the user. Read the [sudo-less Docker](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) guide to learn more. 
@@ -165,7 +165,7 @@ Visit the UI at http://localhost:3000 or your VM's address and `:3000`.
 
 Execute each command in a separate terminal window. A window manager such a [`tmux`](https://github.com/tmux/tmux/wiki) is highly recommended.
 
-#### Stack 1 (DSP-X and SSP-X)
+#### Stack 1 (DSP-X and SSP-BA)
 
 Run the following commands in root folder of the first B&A Stack
 
@@ -183,14 +183,14 @@ BUYER_KV_SERVER_ADDR="https://192.168.84.100:5003/kv" \
   ./tools/debug/start_bfe
 ```
 
-##### SSP-X Auction Service 
+##### SSP-BA Auction Service 
 
 ```bash
 AUCTION_JS_URL="https://192.168.84.100:6002/score-ad.js" \
   ./tools/debug/start_auction
 ```
 
-##### SSP-X SFE Service A
+##### SSP-BA SFE Service A
 
 ```bash
 SELLER_ORIGIN_DOMAIN="https://localhost:6002" \
@@ -198,7 +198,7 @@ KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6002/kv" \
   ./tools/debug/start_sfe
 ```
 
-#### Stack 2 (DSP-Y and SSP-Y)
+#### Stack 2 (DSP-Y and SSP-MIX)
 
 Run the following commands in root folder of the second B&A Stack
 
@@ -216,14 +216,14 @@ BUYER_KV_SERVER_ADDR="https://192.168.84.100:5004/kv" \
   ./tools/debug/start_bfe
 ```
 
-##### SSP-Y Auction Service
+##### SSP-MIX Auction Service
 
 ```bash
 AUCTION_JS_URL="https://192.168.84.100:6003/score-ad.js" \
   ./tools/debug/start_auction
 ```
 
-##### SSP-Y SFE Service
+##### SSP-MIX SFE Service
 
 ```bash
 SELLER_ORIGIN_DOMAIN="https://localhost:6003" \
@@ -234,20 +234,20 @@ KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6003/kv" \
 ## Design
 
 * `SSP-TOP` - The top-level seller 
-* `SSP-X` - B&A-only seller
-* `SSP-Y` - B&A + on-device (mixed-mode) seller
-* `SSP-O` - On-device-only seller
+* `SSP-BA` - B&A-only seller
+* `SSP-MIX` - Mixed-mode seller
+* `SSP-OD` - On-device-only seller
 * `DSP-A` and `DSP-B` - On-device buyers
 * `DSP-X` and `DSP-Y` - B&A buyers
 
 The demo runs the following set of auctions: 
-* On-device single-seller auction with `SSP-O`, `DSP-A`, and `DSP-B`
-* B&A single-seller auction with `SSP-X`, `DSP-X`, and `DSP-Y`
-* B&A single-seller mixed-mode auction with `SSP-Y`, `DSP-X`, `DSP-Y`, `DSP-A`, and `DSP-B`
+* On-device single-seller auction with `SSP-OD`, `DSP-A`, and `DSP-B`
+* B&A single-seller auction with `SSP-BA`, `DSP-X`, and `DSP-Y`
+* B&A single-seller mixed-mode auction with `SSP-MIX`, `DSP-X`, `DSP-Y`, `DSP-A`, and `DSP-B`
 * B&A multi-seller auction by `SSP-TOP` with: 
-  * `SSP-O` - on-device component auction
-  * `SSP-X` - B&A-only component auction
-  * `SSP-Y` - mixed-mode component auction
+  * `SSP-OD` - on-device component auction
+  * `SSP-BA` - B&A-only component auction
+  * `SSP-MIX` - mixed-mode component auction
 
 ### Architecture
 
@@ -260,9 +260,9 @@ The demo runs the following set of auctions:
 * DSP-X - https://localhost:5003
 * DSP-Y - https://localhost:5004
 * SSP-TOP - https://localhost:6001
-* SSP-X - https://localhost:6002
-* SSP-Y - https://localhost:6003
-* SSP-O - https://localhost:6004
+* SSP-BA - https://localhost:6002
+* SSP-MIX - https://localhost:6003
+* SSP-OD - https://localhost:6004
 
 ### Docker network
 
@@ -279,9 +279,9 @@ To examine the `ba-dev` network, run `docker network inspect ba-dev` in the comm
 * DSP-X - https://192.168.84.100:5003
 * DSP-Y - https://192.168.84.100:5004
 * SSP-TOP - https://192.168.84.100:6001
-* SSP-X - https://192.168.84.100:6002
-* SSP-Y - https://192.168.84.100:6003
-* SSP-O - https://192.168.84.100:6004
+* SSP-BA - https://192.168.84.100:6002
+* SSP-MIX - https://192.168.84.100:6003
+* SSP-OD - https://192.168.84.100:6004
 
 #### B&A Services
 

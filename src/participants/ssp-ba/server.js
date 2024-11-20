@@ -21,12 +21,12 @@ import morgan from 'morgan';
 
 import createSfeClient from './sfe-client/index.js';
 
-const sspY = express();
-sspY.use(express.json());
-sspY.use(cors());
-sspY.use(
+const sspBA = express();
+sspBA.use(express.json());
+sspBA.use(cors());
+sspBA.use(
   morgan(
-    '[:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+    '[SSP-BA] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
   )
 );
 
@@ -56,22 +56,17 @@ function decodeRequest(auctionRequest) {
 /**
  * Server-side B&A ad auction
  */
-sspY.post('/ad-auction', (req, res) => {
+sspBA.post('/ad-auction', (req, res) => {
   const {
     adAuctionRequest, // Encrypted payload from the client. Base64 encoded.
     sfeAddress, // SFE address supplied by the app UI
     isComponentAuction, // A flag set by the demo
   } = req.body;
 
+  // SFE SelectAd request payload
   const selectAdRequest = {
     auction_config: {
-      // For the single-seller mixed-mode auction, the top-level seller is the
-      // same as the single-seller SSP-Y. For the multi-seller auction, the top-level
-      // seller is SSP-TOP
-      top_level_seller: isComponentAuction
-        ? 'https://localhost:6001' // SSP-TOP top-level seller
-        : 'https://localhost:6003', // SSP-Y mixed-mode seller
-      seller: 'https://localhost:6003', // SSP-Y mixed-mode seller
+      seller: 'https://localhost:6002', // SSP-BA B&A seller
       auction_signals: '{"testKey":"someValue"}',
       seller_signals: '{"testKey":"someValue"}',
       buyer_list: [
@@ -88,13 +83,19 @@ sspY.post('/ad-auction', (req, res) => {
     protected_auction_ciphertext: decodeRequest(adAuctionRequest),
   };
 
-  // Create gRPC client for Stack 2 SFE
+  // If this auction is a part of a multi-seller auction, then the
+  // top-level seller is filled out
+  if (isComponentAuction) {
+    selectAdRequest.auction_config.top_level_seller = 'https://localhost:6001'; // SSP-TOP
+  }
+
+  // Create gRPC client for Stack 1 SFE
   const sfeClient = createSfeClient(sfeAddress);
 
   // Call SelectAd
   sfeClient.selectAd(selectAdRequest, (error, response) => {
     if (!response) {
-      console.log('[SSP-Y SFE client] !!! ', error);
+      console.log('[SSP-BA SFE client error] ', error);
       return;
     }
 
@@ -113,26 +114,16 @@ sspY.post('/ad-auction', (req, res) => {
     res.json({ serverAdAuctionResponse });
 
     console.log(
-      `[SSP-Y] Encoded serverAdAuctionResponse - ${serverAdAuctionResponse}`
+      `[SSP-BA] Encoded serverAdAuctionResponse - ${serverAdAuctionResponse}`
     );
-    console.log(`[SSP-Y] Ad-Auction-Result hash - ${ciphertextShaHash}`);
+    console.log(`[SSP-BA] Ad-Auction-Result hash - ${ciphertextShaHash}`);
   });
 });
 
-sspY.use(
-  express.static('src/participants/ssp-y', {
-    setHeaders: (res, path) => {
-      if (path.includes('score-ad.js')) {
-        return res.set('Ad-Auction-Allowed', 'true');
-      }
-    },
-  })
-);
-
 /**
- * Mock SSP-Y K/V BYOB server
+ * Mock SSP-BA K/V BYOB server
  */
-sspY.get('/kv', (req, res) => {
+sspBA.get('/kv', (req, res) => {
   res.setHeader('Ad-Auction-Allowed', true);
 
   res.json({
@@ -143,4 +134,6 @@ sspY.get('/kv', (req, res) => {
   });
 });
 
-export default sspY;
+sspBA.use(express.static('src/participants/ssp-ba'));
+
+export default sspBA;

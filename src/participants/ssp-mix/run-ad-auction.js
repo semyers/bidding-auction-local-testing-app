@@ -15,9 +15,9 @@
  */
 
 /**
- * Run the SSP-Y mixed-mode auction
+ * Run the SSP-MIX mixed-mode auction
  */
-function runSspYAuction() {
+function runSspMixAuction() {
   class AdAuction {
     // The SFE network address is supplied by the App UI
     constructor(sfeAddress) {
@@ -50,16 +50,16 @@ function runSspYAuction() {
       this.#renderAd(clientAdAuctionResult);
 
       // Logs
-      console.log('[SSP-Y] Server-side ad auction data - ', {
+      console.log('[SSP-MIX] Server-side ad auction data - ', {
         request,
         requestId,
       });
       console.log(
-        '[SSP-Y] Server-side ad auction result - ',
+        '[SSP-MIX] Server-side ad auction result - ',
         serverAdAuctionResult
       );
       console.log(
-        '[SSP-Y] Client-side ad auction result - ',
+        '[SSP-MIX] Client-side ad auction result - ',
         clientAdAuctionResult
       );
     }
@@ -74,7 +74,7 @@ function runSspYAuction() {
      */
     #getAdAuctionData() {
       const adAuctionDataConfig = {
-        seller: 'https://localhost:6003', // SSP-Y mixed-mode seller
+        seller: 'https://localhost:6003', // SSP-MIX mixed-mode seller
         requestSize: 51200,
         perBuyerConfig: {
           'https://localhost:5003': { targetSize: 8192 }, // DSP-X B&A buyer
@@ -133,21 +133,21 @@ function runSspYAuction() {
      */
     #runClientAdAuction(requestId, serverAdAuctionResult) {
       const auctionConfig = {
-        seller: 'https://localhost:6003', // SSP-Y mixed-mode seller
+        seller: 'https://localhost:6003', // SSP-MIX mixed-mode seller
         decisionLogicURL: 'https://localhost:6003/score-ad.js',
         // For mixed-mode, each auction type is added as a component auction
         componentAuctions: [
           // B&A auction
           {
             // For mixed-mode, the component seller is same as the top-level seller
-            seller: 'https://localhost:6003', // SSP-Y mixed-mode seller
+            seller: 'https://localhost:6003', // SSP-MIX mixed-mode seller
             requestId,
             serverResponse: serverAdAuctionResult,
           },
           // On-device auction
           {
             // For mixed-mode, the component seller is same as the top-level seller
-            seller: 'https://localhost:6003', // SSP-Y mixed-mode seller
+            seller: 'https://localhost:6003', // SSP-MIX mixed-mode seller
             decisionLogicURL: 'https://localhost:6003/score-ad.js',
             interestGroupBuyers: [
               'https://localhost:5001', // DSP-A on-device buyer
@@ -158,7 +158,7 @@ function runSspYAuction() {
         resolveToConfig: true,
       };
 
-      console.log('[SSP-Y] Auction config - ', auctionConfig);
+      console.log('[SSP-MIX] Auction config - ', auctionConfig);
 
       return navigator.runAdAuction(auctionConfig);
     }
@@ -212,4 +212,4 @@ function runSspYAuction() {
   adAuction.run();
 }
 
-runSspYAuction();
+runSspMixAuction();

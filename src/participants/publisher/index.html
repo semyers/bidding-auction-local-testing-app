@@ -41,17 +41,17 @@
       // The query param comes from the "Run auction" buttons on the main app page
       switch (queryParams.get('auctionType')) {
         case 'single-seller-on-device':
-          // SSP-O script
+          // SSP-OD script
           appendSellerScript('https://localhost:6004/run-ad-auction.js');
           break;
 
         case 'single-seller-ba':
-          // SSP-X script
+          // SSP-BA script
           appendSellerScript('https://localhost:6002/run-ad-auction.js');
           break;
 
         case 'single-seller-mixed-mode':
-          // SSP-Y script
+          // SSP-MIX script
           appendSellerScript('https://localhost:6003/run-ad-auction.js');
           break;
 
