@@ -13,10 +13,10 @@ To ease the B&A testing process, the LTA provides the following participants:
   * On-device-only auctions: `DSP-A` and `DSP-B`
   * B&A-only auctions: `DSP-X` and `DSP-Y`
 * SSPs 
-  * On-device-only auction: `SSP-OD` ([Logic](aidaa))
-  * B&A-only auction: `SSP-BA` ([Logic](aidaa))
-  * Mixed-mode auction: `SSP-MIX` ([Logic](aidaa))
-  * Multi-seller auction: `SSP-TOP` ([Logic](aidaa))
+  * On-device-only auction: `SSP-OD`
+  * B&A-only auction: `SSP-BA`
+  * Mixed-mode auction: `SSP-MIX`
+  * Multi-seller auction: `SSP-TOP`
 
 Each participant provides mock bidding/scoring logic for B&A running locally can use.
 
@@ -60,50 +60,26 @@ Use a linux local machine, or provision a linux VM of the cloud provider of your
 
 #### Pull down the Bidding and Auction Services repository
 
-For our demo, we will be using two stacks of B&A to simulate auctions involving multiple buyers and sellers. 
+For our demo, we will be using two sets of B&A to simulate auctions involving multiple buyers and sellers. 
 
-Stack 1: 
+Set 1: 
 ```bash
-git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-1
+git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-set-a
 ```
 
-Stack 2: 
+Set 2: 
 ```bash
-git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-2
+git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-set-b
 ```
 
-##### Apply Git patch
-
-> This is a temporary step that won't be necessary in 4.5+ release in the future
-
-There are some changes we need to make to the B&A code to allow the local testing app to run. The changes in this patch will be included in a future B&A release, and the patch will not be necessary then. 
-
-We will use the 4.3 release. 
-
-1. Download the patch and place it in the B&A repository folder
-2. Apply the patch in Stack 1 repository (in the `bidding-auction-servers-1` folder)
-
+In both folders, check out to the release version 4.4: 
 ```bash
-> cd bidding-auction-servers-1
-> git checkout release-4.3
-> curl https://raw.githubusercontent.com/privacysandbox/bidding-auction-local-console/refs/heads/main/resources/stack-1.patch > stack.patch
-> git apply stack.patch
-> git status
-```
-
-3. Apply the patch in Stack 2 repository (in the `bidding-auction-servers-2` folder). This is a different patch from the stack 1 patch.
-
-```bash
-> cd ../bidding-auction-servers-2
-> git checkout release-4.3
-> curl https://raw.githubusercontent.com/privacysandbox/bidding-auction-local-console/refs/heads/main/resources/stack-2.patch > stack.patch
-> git apply stack.patch
-> git status
+git checkout release-4.4
 ```
 
 #### Build the services
 
-Execute the following command from the root of each stack's repository to build the services: 
+Execute the following command from the root of each set's repository to build the services: 
 
 ```bash
 ./production/packaging/build_and_test_all_in_docker \
@@ -133,14 +109,15 @@ Pull down this repository:
 git clone https://github.com/privacysandbox/bidding-auction-local-testing-app.git
 ```
 
-From the root folder of the repo, run the following: 
+From the root of the repository, run the setup script: 
 
-Setup the app: 
-```
-./setup 
+```bash
+./setup
 ```
 
-Start the app:
+The setup script will create the `ba-dev` Docker network, generate SSL certificates, and build the images. 
+
+Once the build is successful, run the start script: 
 
 ```bash
 ./start
@@ -155,7 +132,7 @@ google-chrome --enable-privacy-sandbox-ads-apis --disable-features=EnforcePrivac
 
 The flag is set to let Chrome know to use the mock coordinator key that we have hosted at [https://storage.googleapis.com/ba-test-buyer/coordinator-test-key.json](https://storage.googleapis.com/ba-test-buyer/coordinator-test-key.json)
 
-Make sure you have fully exited out of all Chrome instances before opening it from the command line with the B&A flags. 
+Make sure you have fully exited out of all Chrome instances before opening it from the command line with the B&A flags. To exit out of all Chrome processes, try running `ps aux | grep -ie chrome/chrome | awk '{print $2}' | xargs kill -9` from the command line.
 
 ### Open the page in Chrome
 
@@ -165,69 +142,91 @@ Visit the UI at http://localhost:3000 or your VM's address and `:3000`.
 
 Execute each command in a separate terminal window. A window manager such a [`tmux`](https://github.com/tmux/tmux/wiki) is highly recommended.
 
-#### Stack 1 (DSP-X and SSP-BA)
+#### Set 1 (DSP-X and SSP-BA)
 
-Run the following commands in root folder of the first B&A Stack
+Run the following commands in root folder of the first B&A set
 
 ##### DSP-X Bidding Service
 
 ```bash
-BIDDING_JS_URL="https://192.168.84.100:5003/generate-bid.js" \
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.101 --network=ba-dev" \
+BIDDING_JS_URL=https://192.168.84.100:5003/generate-bid.js \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_bidding
 ```
 
 ##### DSP-X BFE Service
 
 ```bash
-BUYER_KV_SERVER_ADDR="https://192.168.84.100:5003/kv" \
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.102 --network=ba-dev" \
+BUYER_KV_SERVER_ADDR=https://192.168.84.100:5003/kv \
+BIDDING_SERVER_ADDR=192.168.84.101:50057 \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_bfe
 ```
 
 ##### SSP-BA Auction Service 
 
 ```bash
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.103 --network=ba-dev" \
 AUCTION_JS_URL="https://192.168.84.100:6002/score-ad.js" \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_auction
 ```
 
 ##### SSP-BA SFE Service A
 
 ```bash
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.104 --network=ba-dev" \
 SELLER_ORIGIN_DOMAIN="https://localhost:6002" \
-KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6002/kv" \
+AUCTION_SERVER_ADDR="192.168.84.103:50061" \
+KEY_VALUE_SIGNALS_ADDR="https://192.168.84.100:6002/kv" \
+BUYER_SERVER_ADDRS_JSON='{"https://localhost:5003":{"url":"192.168.84.102:50051","cloudPlatform":"LOCAL"},"https://localhost:5004":{"url":"192.168.84.202:50051","cloudPlatform":"LOCAL"}}' \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_sfe
 ```
 
-#### Stack 2 (DSP-Y and SSP-MIX)
+#### Set 2 (DSP-Y and SSP-MIX)
 
-Run the following commands in root folder of the second B&A Stack
+Run the following commands in root folder of the second B&A set
 
 ##### DSP-Y Bidding Service
 
 ```bash
-BIDDING_JS_URL="https://192.168.84.100:5004/generate-bid.js" \
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.201 --network=ba-dev" \
+BIDDING_JS_URL=https://192.168.84.100:5004/generate-bid.js \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_bidding
 ```
 
 ##### DSP-Y BFE Service
 
 ```bash
-BUYER_KV_SERVER_ADDR="https://192.168.84.100:5004/kv" \
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.202 --network=ba-dev" \
+BUYER_KV_SERVER_ADDR=https://192.168.84.100:5004/kv \
+BIDDING_SERVER_ADDR=192.168.84.201:50057 \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_bfe
 ```
 
 ##### SSP-MIX Auction Service
 
 ```bash
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.203 --network=ba-dev" \
 AUCTION_JS_URL="https://192.168.84.100:6003/score-ad.js" \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_auction
 ```
 
 ##### SSP-MIX SFE Service
 
 ```bash
+DOCKER_RUN_ARGS_STRING="--ip=192.168.84.204 --network=ba-dev" \
 SELLER_ORIGIN_DOMAIN="https://localhost:6003" \
-KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6003/kv" \
+AUCTION_SERVER_ADDR="192.168.84.203:50061" \
+KEY_VALUE_SIGNALS_ADDR="https://192.168.84.100:6002/kv" \
+BUYER_SERVER_ADDRS_JSON='{"https://localhost:5003":{"url":"192.168.84.102:50051","cloudPlatform":"LOCAL"},"https://localhost:5004":{"url":"192.168.84.202:50051","cloudPlatform":"LOCAL"}}' \
+SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_sfe
 ```
 
@@ -240,7 +239,7 @@ KEY_VALUE_SIGNALS_HOST="https://192.168.84.100:6003/kv" \
 * `DSP-A` and `DSP-B` - On-device buyers
 * `DSP-X` and `DSP-Y` - B&A buyers
 
-The demo runs the following set of auctions: 
+The demo runs the following type of auctions: 
 * On-device single-seller auction with `SSP-OD`, `DSP-A`, and `DSP-B`
 * B&A single-seller auction with `SSP-BA`, `DSP-X`, and `DSP-Y`
 * B&A single-seller mixed-mode auction with `SSP-MIX`, `DSP-X`, `DSP-Y`, `DSP-A`, and `DSP-B`
@@ -285,13 +284,12 @@ To examine the `ba-dev` network, run `docker network inspect ba-dev` in the comm
 
 #### B&A Services
 
-* Stack 1
-  * BidServ-1 - http://192.168.84.100:50057
-  * BFE-1 - http://192.168.84.101:50051
-  * AucServ-1 - http://192.168.84.102:50061
-  * SFE-1 - http://192.168.84.103:50053
-
-Stack 2
+* Set 1
+  * BidServ-1 - http://192.168.84.101:50057
+  * BFE-1 - http://192.168.84.102:50051
+  * AucServ-1 - http://192.168.84.103:50061
+  * SFE-1 - http://192.168.84.104:50053
+* Set 2
   * BidServ-2 - http://192.168.84.201:50057
   * BFE-2 - http://192.168.84.202:50051
   * AucServ-2 - http://192.168.84.203:50061
