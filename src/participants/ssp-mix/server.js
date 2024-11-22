@@ -15,6 +15,7 @@
  */
 
 import { createHash } from 'crypto';
+import grpc from '@grpc/grpc-js';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
@@ -63,6 +64,12 @@ sspMix.post('/ad-auction', (req, res) => {
     isComponentAuction, // A flag set by the demo
   } = req.body;
 
+  // Metadata forwarding
+  const metadata = new grpc.Metadata();
+  metadata.add('X-Accept-Language', req.header('Accept-Language'));
+  metadata.add('X-User-Agent', req.header('User-Agent'));
+  metadata.add('X-BnA-Client-IP', req.ip);
+
   const selectAdRequest = {
     auction_config: {
       // For the single-seller mixed-mode auction, the top-level seller is the
@@ -92,7 +99,7 @@ sspMix.post('/ad-auction', (req, res) => {
   const sfeClient = createSfeClient(sfeAddress);
 
   // Call SelectAd
-  sfeClient.selectAd(selectAdRequest, (error, response) => {
+  sfeClient.selectAd(selectAdRequest, metadata, (error, response) => {
     if (!response) {
       console.log('[SSP-MIX SFE client] !!! ', error);
       return;
