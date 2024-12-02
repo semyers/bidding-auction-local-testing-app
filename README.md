@@ -72,11 +72,6 @@ Set 2:
 git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-set-b
 ```
 
-In both folders, check out to the release version 4.4: 
-```bash
-git checkout release-4.4
-```
-
 #### Build the services
 
 Execute the following command from the root of each set's repository to build the services: 
