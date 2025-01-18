@@ -58,23 +58,25 @@ Use a linux local machine, or provision a linux VM of the cloud provider of your
 
 ### Setup the services
 
-#### Pull down the Bidding and Auction Services repository
+#### Pull down the Bidding and Auction Services and TKV repositories
 
-For our demo, we will be using two sets of B&A to simulate auctions involving multiple buyers and sellers. 
+For our demo, we will be using two sets of B&A to simulate auctions involving multiple buyers and sellers as well as a Trusted Key/Kalue (TKV) service for each buyer and seller.
 
-Set 1: 
+Later, we will use Docker to start up multiple copies of each type of server from a single codebase.
+
+B&A servers:
 ```bash
-git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-set-a
+git clone https://github.com/privacysandbox/bidding-auction-servers.git
 ```
 
-Set 2: 
+TKV server:
 ```bash
-git clone https://github.com/privacysandbox/bidding-auction-servers.git bidding-auction-servers-set-b
+git clone https://github.com/privacysandbox/protected-auction-key-value-service.git
 ```
 
 #### Build the services
 
-Execute the following command from the root of each set's repository to build the services: 
+Execute the following command from the root of the bidding-auction-servers repository to build the B&A services: 
 
 ```bash
 ./production/packaging/build_and_test_all_in_docker \
@@ -90,7 +92,17 @@ Execute the following command from the root of each set's repository to build th
   --gcp-skip-image-upload
 ```
 
-This step may take up to 3 hours on an 8-core machine and an hour on a 32-core machine (Sorry! We are working on improving this process!).  
+Execute the following command from the root of the protected-auction-key-value-service repository to build the TKV service: 
+
+```bash
+./production/packaging/build_and_test_all_in_docker \
+  --platform local \
+  --instance local \
+  --no-precommit \
+  --mode nonprod
+```
+
+These steps may take up to 3 hours on an 8-core machine and an hour on a 32-core machine (Sorry! We are working on improving this process!).  
 
 [Relevant xkcd meme](https://xkcd.com/303/): 
 
@@ -137,9 +149,9 @@ Visit the UI at http://localhost:3000 or your VM's address and `:3000`.
 
 Execute each command in a separate terminal window. A window manager such a [`tmux`](https://github.com/tmux/tmux/wiki) is highly recommended.
 
-#### Set 1 (DSP-X and SSP-BA)
+#### B&A Set 1 (DSP-X and SSP-BA)
 
-Run the following commands in root folder of the first B&A set
+Run the following commands in root folder of the bidding-auction-servers repository
 
 ##### DSP-X Bidding Service
 
@@ -155,6 +167,7 @@ SKIP_TLS_VERIFICATION=true \
 ```bash
 DOCKER_RUN_ARGS_STRING="--ip=192.168.84.102 --network=ba-dev" \
 BUYER_KV_SERVER_ADDR=https://192.168.84.100:5003/kv \
+BUYER_TKV_V2_SERVER_ADDR=192.168.84.106:50051 \
 BIDDING_SERVER_ADDR=192.168.84.101:50057 \
 SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_bfe
@@ -176,14 +189,41 @@ DOCKER_RUN_ARGS_STRING="--ip=192.168.84.104 --network=ba-dev" \
 SELLER_ORIGIN_DOMAIN="https://localhost:6002" \
 AUCTION_SERVER_ADDR="192.168.84.103:50061" \
 KEY_VALUE_SIGNALS_ADDR="https://192.168.84.100:6002/kv" \
+TRUSTED_KEY_VALUE_V2_SIGNALS_ADDR="192.168.84.105:50051" \
 BUYER_SERVER_ADDRS_JSON='{"https://localhost:5003":{"url":"192.168.84.102:50051","cloudPlatform":"LOCAL"},"https://localhost:5004":{"url":"192.168.84.202:50051","cloudPlatform":"LOCAL"}}' \
 SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_sfe
 ```
 
-#### Set 2 (DSP-Y and SSP-MIX)
+#### TKV Set 1 (DSP-X and SSP-BA)
 
-Run the following commands in root folder of the second B&A set
+Run the following commands in root folder of the protected-auction-key-value-service repository
+
+##### DSP-X Trusted Key/Value Service
+
+```bash
+docker run --ip 192.168.84.106 --network ba-dev \
+  -it --init --rm --name tkv-dsp-x \
+  --volume=$PWD/src/participants/dsp-x/tkv/deltas:/tmp/deltas \
+  --volume=$PWD/src/participants/dsp-x/tkv/realtime:/tmp/realtime \
+  bazel/production/packaging/local/data_server:server_docker_image \
+  -delta_directory=/tmp/deltas -realtime_directory=/tmp/realtime
+```
+
+##### SSP-BA Trusted Key/Value Service
+
+```bash
+docker run --ip 192.168.84.105 --network ba-dev \
+  -it --init --rm --name tkv-ssp-ba \
+  --volume=$PWD/src/participants/ssp-ba/tkv/deltas:/tmp/deltas \
+  --volume=$PWD/src/participants/ssp-ba/tkv/realtime:/tmp/realtime \
+  bazel/production/packaging/local/data_server:server_docker_image \
+  -delta_directory=/tmp/deltas -realtime_directory=/tmp/realtime
+```
+
+#### B&A Set 2 (DSP-Y and SSP-MIX)
+
+Run the following commands in root folder of the bidding-auction-servers repository
 
 ##### DSP-Y Bidding Service
 
@@ -199,6 +239,7 @@ SKIP_TLS_VERIFICATION=true \
 ```bash
 DOCKER_RUN_ARGS_STRING="--ip=192.168.84.202 --network=ba-dev" \
 BUYER_KV_SERVER_ADDR=https://192.168.84.100:5004/kv \
+BUYER_TKV_V2_SERVER_ADDR=192.168.84.206:50051 \
 BIDDING_SERVER_ADDR=192.168.84.201:50057 \
 SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_bfe
@@ -220,9 +261,36 @@ DOCKER_RUN_ARGS_STRING="--ip=192.168.84.204 --network=ba-dev" \
 SELLER_ORIGIN_DOMAIN="https://localhost:6003" \
 AUCTION_SERVER_ADDR="192.168.84.203:50061" \
 KEY_VALUE_SIGNALS_ADDR="https://192.168.84.100:6002/kv" \
+TRUSTED_KEY_VALUE_V2_SIGNALS_ADDR="192.168.84.205:50051" \
 BUYER_SERVER_ADDRS_JSON='{"https://localhost:5003":{"url":"192.168.84.102:50051","cloudPlatform":"LOCAL"},"https://localhost:5004":{"url":"192.168.84.202:50051","cloudPlatform":"LOCAL"}}' \
 SKIP_TLS_VERIFICATION=true \
   ./tools/debug/start_sfe
+```
+
+#### TKV Set 2 (DSP-Y and SSP-MIX)
+
+Run the following commands in root folder of the protected-auction-key-value-service repository
+
+##### DSP-Y Trusted Key/Value Service
+
+```bash
+docker run --ip 192.168.84.206 --network ba-dev \
+  -it --init --rm --name tkv-dsp-y \
+  --volume=$PWD/src/participants/dsp-y/tkv/deltas:/tmp/deltas \
+  --volume=$PWD/src/participants/dsp-y/tkv/realtime:/tmp/realtime \
+  bazel/production/packaging/local/data_server:server_docker_image \
+  -delta_directory=/tmp/deltas -realtime_directory=/tmp/realtime
+```
+
+##### SSP-MIX Trusted Key/Value Service
+
+```bash
+docker run --ip 192.168.84.205 --network ba-dev \
+  -it --init --rm --name tkv-ssp-mix \
+  --volume=$PWD/src/participants/ssp-mix/tkv/deltas:/tmp/deltas \
+  --volume=$PWD/src/participants/ssp-mix/tkv/realtime:/tmp/realtime \
+  bazel/production/packaging/local/data_server:server_docker_image \
+  -delta_directory=/tmp/deltas -realtime_directory=/tmp/realtime
 ```
 
 ## Design
@@ -289,3 +357,12 @@ To examine the `ba-dev` network, run `docker network inspect ba-dev` in the comm
   * BFE-2 - http://192.168.84.202:50051
   * AucServ-2 - http://192.168.84.203:50061
   * SFE-2 - http://192.168.84.204:50053
+
+#### TKV Services
+
+* Set 1
+  * TKV-SSP-BA - grpc://192.168.84.105:50051
+  * TKV-DSP-X - grpc://192.168.84.106:50051
+* Set 2
+  * TKV-SSP-MIX - grpc://192.168.84.205:50051
+  * TKV-DSP-Y - grpc://192.168.84.206:50051
