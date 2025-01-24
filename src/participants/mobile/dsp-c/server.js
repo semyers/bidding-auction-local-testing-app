@@ -15,21 +15,27 @@
  */
 
 /**
- * Setup the app server and the B&A participant servers.
- *
- * This file contains the logic for the testing app,
- * and does not contain Protected Audience logic.
+ * Setup the DSP-C B&A buyer server
  */
+import express from 'express';
+import morgan from 'morgan';
 
+const dspX = express();
 
-import * as mobile from './mobile.js';
-import * as web from './web.js';
+dspX.use(
+  morgan(
+    '[DSP-C] [:date[clf]] :remote-addr :remote-user :method :url :status :response-time ms'
+  )
+);
 
-const testServers = {mobile, web};
-const mode = process.argv[2] === 'mobile' ? 'mobile' : 'web';
+dspX.use(
+  express.static('src/participants/mobile/dsp-c', {
+    setHeaders: (res, path) => {
+      if (path.includes('generate-bid.js')) {
+        return res.set('Ad-Auction-Allowed', 'true');
+      }
+    },
+  })
+);
 
-console.log('---');
-console.log(`Starting ${mode.toUpperCase()} testing servers`);
-
-// Launch either mobile or web test servers depending on chosen mode
-testServers[mode].start()
+export default dspX;
