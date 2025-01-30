@@ -60,7 +60,6 @@ function decodeRequest(auctionRequest) {
 sspBA.post('/ad-auction', (req, res) => {
   const {
     adAuctionRequest, // Encrypted payload from the client. Base64 encoded.
-    sfeAddress, // SFE address supplied by the mobile client
   } = req.body;
 
   // Metadata forwarding
@@ -88,7 +87,7 @@ sspBA.post('/ad-auction', (req, res) => {
   };
 
   // Create gRPC client for SFE
-  const sfeClient = createSfeClient(sfeAddress);
+  const sfeClient = createSfeClient('192.168.84.104:50053');
 
   // Call SelectAd
   sfeClient.selectAd(selectAdRequest, metadata, (error, response) => {
